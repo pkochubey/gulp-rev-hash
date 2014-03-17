@@ -53,6 +53,7 @@ module.exports = function(options) {
           var assets, type;
           var section = sections[i].split(startReg);
           html.push(section[0]);
+          html.push('<!-- rev-hash -->\r\n')
 
           var cssAssets = getFiles(section[1], cssReg);
           var jsAssets = getFiles(section[1], jsReg);
@@ -68,13 +69,13 @@ module.exports = function(options) {
                   path.join((options.assetsDir?options.assetsDir:''), asset), {encoding: 'utf8'}))
               .digest("hex");
               if (type === 'css') {
-                html.push('<link rel="stylesheet" href="' + asset + '?v=' + hash + '"/>');
+                html.push('<link rel="stylesheet" href="' + asset + '?v=' + hash + '"/>\r\n');
               }
               else {
-                html.push('<script src="' + asset + '?v=' + hash + '"></script>');
+                html.push('<script src="' + asset + '?v=' + hash + '"></script>\r\n');
               }
-
           }
+          html.push('<!-- end -->');
         }
         else { html.push(sections[i]); }
       }
