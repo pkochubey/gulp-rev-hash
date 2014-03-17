@@ -1,77 +1,87 @@
 var path = require('path');
-var through = require('through2');
-var cheerio = require('cheerio');
-var gutil = require('gulp-util');
 var fs = require('fs');
-var url = require('url');
-var _ = require('lodash');
+var EOL = require('os').EOL;
 
-module.exports = function (options) {
+var through = require('through2');
+var gutil = require('gulp-util');
+var glob = require('glob');
 
-  var defaultOptions = {
-    cwd: '',
-    suffix: 'v',
-    fileTypes: ['js', 'css']
-  };
+module.exports = function(options) {
+  options = options || {};
 
-  options = _.merge(defaultOptions, options);
+  var startReg = /<!--\s*rev\-hash\s*-->/gim;
+  var endReg = /<!--\s*end\s*-->/gim;
+  var jsReg = /<\s*script\s+.*?src\s*=\s*"([^"]+.js).*".*?><\s*\/\s*script\s*>/gi;
+  var cssReg = /<\s*link\s+.*?href\s*=\s*"([^"]+.css).*".*?>/gi;
+  var basePath, mainPath, mainName, alternatePath;
 
-  return through.obj(function (file, enc, cb) {
+  function getBlockType(content) {
+    return jsReg.test(content) ? 'js' : 'css';
+  }
 
-    var elementAttributes = {
-      js: {
-        name: 'script',
-        srcAttribute: 'src'
-      },
-      css: {
-        name: 'link',
-        srcAttribute: 'href'
-      }
-    };
+  function getFiles(content, reg) {
+    var paths = [];
+    var files = [];
 
+    content
+      .replace(/<!--(?:(?:.|\r|\n)*?)-->/gim, '')
+      .replace(reg, function (a, b) {
+        paths.push(b);
+      });
+
+    return paths;
+  }
+
+  return through.obj(function(file, enc, callback) {
     if (file.isNull()) {
-      this.push(file);
-      return cb();
+      this.push(file); // Do nothing if no contents
+      callback();
     }
-
-    if (file.isStream()) {
-      this.emit('error', new gutil.PluginError('gulp-rev-hash', 'Streaming is not supported'));
-      return cb();
+    else if (file.isStream()) {
+      this.emit('error', new gutil.PluginError('gulp-usemin', 'Streams are not supported!'));
+      callback();
     }
+    else {
+      basePath = file.base;
+      mainPath = path.dirname(file.path);
+      mainName = path.basename(file.path);
 
-    try {
-      var $ = cheerio.load(file.contents.toString());
+      var html = [];
+      var sections = String(file.contents).split(endReg);
 
-      for (var i = 0; i < options.fileTypes.length; i++) {
-        var fileType = options.fileTypes[i];
-        var attributes = elementAttributes[fileType];
+      for (var i = 0, l = sections.length; i < l; ++i) {
+        if (sections[i].match(startReg)) {
+          var assets, type;
+          var section = sections[i].split(startReg);
+          html.push(section[0]);
 
-        var $assets = $(attributes.name);
+          var cssAssets = getFiles(section[1], cssReg);
+          var jsAssets = getFiles(section[1], jsReg);
+          if (cssAssets.length > 0) { assets = cssAssets; type = 'css' }
+          else { assets = jsAssets; type = 'js' }
 
-        for (var j = 0; j < $assets.length; j++) {
-          var $asset = $assets.eq(j);
-
-          var src = $asset.attr(attributes.srcAttribute);
-
-          if (src) {
-            src = url.parse(src).pathname;
+          for (var j = 0; j < assets.length; j++) {
+            asset = assets[j];
             var hash = require('crypto')
-            .createHash('md5')
-            .update(fs.readFileSync(path.join(options.cwd, src), {encoding: 'utf8'}))
-            .digest("hex");
+              .createHash('md5')
+              .update(
+                fs.readFileSync(
+                  path.join((options.assetsDir?options.assetsDir:''), asset), {encoding: 'utf8'}))
+              .digest("hex");
+              if (type === 'css') {
+                html.push('<link rel="stylesheet" href="' + asset + '?v=' + hash + '"/>');
+              }
+              else {
+                html.push('<script src="' + asset + '?v=' + hash + '"></script>');
+              }
 
-            $asset.attr(attributes.srcAttribute,  src + '?' + options.suffix + '=' + hash);
           }
         }
+        else { html.push(sections[i]); }
       }
-
-      file.contents = new Buffer($.html());
+      file.contents = new Buffer(html.join(''));
+      this.push(file);
+      return callback();
     }
-    catch (err) {
-      this.emit('error', new gutil.PluginError('gulp-rev-hash', err));
-    }
-
-    this.push(file);
-    return cb();
-  })
+  });
 };
