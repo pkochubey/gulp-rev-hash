@@ -1,40 +1,32 @@
 {
-  "name": "gulp-usemin",
-  "version": "0.3.3",
-  "description": "Replaces references to non-optimized scripts or stylesheets into a set of HTML files (or any templates/views).",
+  "name": "gulp-rev-hash",
+  "version": "0.0.1",
+  "description": "Appends a file's hash to a file URL to cache assets in any file (html, templates)",
   "main": "index.js",
   "dependencies": {
     "gulp-util": "~2.2.14",
-    "through2": "~0.4.1",
-    "glob": "~3.2.9"
+    "through2": "~0.4.1"
   },
   "devDependencies": {
     "event-stream": "~3.1.0",
-    "gulp": "~3.5.5",
-    "gulp-jshint": "~1.5.0",
-    "gulp-mocha": "~0.4.1",
-    "gulp-util": "~2.2.14",
-    "gulp-uglify": "~0.2.1",
-    "gulp-minify-html": "~0.1.1",
-    "gulp-minify-css": "~0.3.0",
-    "gulp-rev": "~0.2.1"
-  },
-  "scripts": {
-    "test": "mocha"
+    "gulp": "~3.5.5"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/zont/gulp-usemin.git"
+    "url": "git://github.com/outluch/gulp-rev-hash.git"
   },
   "keywords": [
     "gulpplugin",
-    "usemin"
+    "js",
+    "javascript",
+    "asset",
+    "caching",
+    "rev",
+    "md5",
+    "hash"
   ],
-  "author": "Alexander Zonov <zont@pochta.ru>",
+  "author": "Konstantin <outluch@gmail.com>",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/zont/gulp-usemin/issues"
-  },
   "engines": {
     "node": ">=0.8"
   }

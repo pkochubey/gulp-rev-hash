@@ -4,7 +4,6 @@ var EOL = require('os').EOL;
 
 var through = require('through2');
 var gutil = require('gulp-util');
-var glob = require('glob');
 
 module.exports = function(options) {
   options = options || {};
