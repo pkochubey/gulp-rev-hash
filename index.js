@@ -35,7 +35,7 @@ module.exports = function (options) {
     }
 
     if (file.isStream()) {
-      this.emit('error', new gutil.PluginError('gulp-rev-mtime', 'Streaming is not supported'));
+      this.emit('error', new gutil.PluginError('gulp-rev-hash', 'Streaming is not supported'));
       return cb();
     }
 
@@ -55,9 +55,12 @@ module.exports = function (options) {
 
           if (src) {
             src = url.parse(src).pathname;
+            var hash = require('crypto')
+            .createHash('md5')
+            .update(fs.readFileSync(path.join(options.cwd, src), {encoding: 'utf8'}))
+            .digest("hex");
 
-            var stats = fs.statSync(path.join(options.cwd, src));
-            $asset.attr(attributes.srcAttribute,  src + '?' + options.suffix + '=' + +stats.mtime);
+            $asset.attr(attributes.srcAttribute,  src + '?' + options.suffix + '=' + hash);
           }
         }
       }
@@ -65,7 +68,7 @@ module.exports = function (options) {
       file.contents = new Buffer($.html());
     }
     catch (err) {
-      this.emit('error', new gutil.PluginError('gulp-rev-mtime', err));
+      this.emit('error', new gutil.PluginError('gulp-rev-hash', err));
     }
 
     this.push(file);

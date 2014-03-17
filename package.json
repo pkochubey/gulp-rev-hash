@@ -1,14 +1,14 @@
 {
-  "name": "gulp-rev-mtime",
+  "name": "gulp-rev-hash",
   "version": "0.0.3",
-  "description": "Appends a file's modified UNIX timestamp to a file URL to cache assets",
+  "description": "Appends a file's hash to a file URL to cache assets",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/thomastuts/gulp-rev-mtime.git"
+    "url": "git://github.com/outluch/gulp-rev-hash.git"
   },
   "keywords": [
     "gulpplugin",
@@ -24,9 +24,9 @@
   "author": "Thomas Tuts",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/thomastuts/gulp-rev-mtime/issues"
+    "url": "https://github.com/outluch/gulp-rev-hash/issues"
   },
-  "homepage": "https://github.com/thomastuts/gulp-rev-mtime",
+  "homepage": "https://github.com/outluch/gulp-rev-hash",
   "dependencies": {
     "gulp-util": "~2.2.14",
     "through2": "~0.4.1",
