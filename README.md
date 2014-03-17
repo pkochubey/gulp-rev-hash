@@ -43,9 +43,14 @@ gulp.task('rev', function () {
 #### Output:
 
 ```html
+<!-- rev-hash -->
 <link rel="stylesheet" href="main.min.css?v=9d58b7441d92130f545778e418d1317d">
+<!-- end -->
 
-<script src="abc.js?v=0401f2bda539bac50b0378d799c2b64e"></script><script src="def.js?v=e478ca95198c5a901c52f7a0f91a5d00"></script>
+<!-- rev-hash -->
+<script src="abc.js?v=0401f2bda539bac50b0378d799c2b64e"></script>
+<script src="def.js?v=e478ca95198c5a901c52f7a0f91a5d00"></script>
+<!-- end -->
 ```
 
 ### Custom options
