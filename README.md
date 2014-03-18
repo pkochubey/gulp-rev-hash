@@ -1,7 +1,7 @@
 gulp-rev-hash
 =============
 
-> Appends a file's hash to a file URL to cache assets
+> Keeps a file's hash in file's links to your assets. For automatic cache updating purpose.
 
 ## Install
 
@@ -14,16 +14,16 @@ npm install --save-dev gulp-rev-hash
 
 ### Default
 
-This example will take the `example.html` file and add rev tags to all files that are found in this file, with default options.
+This example will keep links to assets in `layouts/_base.ect` ECT template always updated on assets change. If your assets are not in root of your project, add assetsDir option, like this: `.pipe(revHash({assetsDir: 'public'}))`
 
 ```js
 var gulp = require('gulp');
-var rev = require('gulp-rev-hash');
+var revHash = require('gulp-rev-hash');
 
-gulp.task('rev', function () {
-	gulp.src('template.html')
-		.pipe(rev())
-		.pipe(gulp.dest('.'));
+gulp.task('rev-hash', function () {
+	gulp.src('layouts/_base.ect')
+		.pipe(revHash())
+		.pipe(gulp.dest('layouts'));
 });
 ```
 
@@ -31,12 +31,12 @@ gulp.task('rev', function () {
 
 ```html
 <!-- rev-hash -->
-<link rel="stylesheet" href="main.min.css"/>
+<link rel="stylesheet" href="main.min.css">
 <!-- end -->
 
 <!-- rev-hash -->
-<script src="abc.js"></script>
-<script src="def.js"></script>
+<script src="abc.js?v=0401f2bda539bac50b0378d799c2b64e"></script>
+<script src="def.js?v=e478ca95198c5a901c52f7a0f91a5d00"></script>
 <!-- end -->
 ```
 
@@ -53,6 +53,8 @@ gulp.task('rev', function () {
 <!-- end -->
 ```
 
+Main idea is that your template always contains a link with hash. So, if you use preprocessing for your assets (compass, less, stylus, coffeescript, dart), if you accidentally added empty line or empty item to your source, preprocessor will generate the same file and your cached resource will have the same hash. And your clients will not redownload file.
+
 ### Custom options
 
 ```
@@ -60,3 +62,8 @@ assetsDir: '/public'
 ```
 
 Path to assets in your project
+
+### Known issues
+
+* Assets links in template should be on new line each.
+* You should wrap in one block `<!-- rev-hash --><!-- end -->` only assets of one type (only js's or only css's) Also you can wrap them individually.
