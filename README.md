@@ -58,7 +58,7 @@ Main idea is that your template always contains a link with hash. So, if you use
 ### Custom options
 
 ```
-assetsDir: '/public'
+assetsDir: 'public'
 ```
 
 Path to assets in your project
