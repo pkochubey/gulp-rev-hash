@@ -66,4 +66,3 @@ Path to assets in your project
 ### Known issues
 
 * Assets links in template should be on new line each.
-* You should wrap in one block `<!-- rev-hash --><!-- end -->` only assets of one type (only js's or only css's) Also you can wrap them individually.

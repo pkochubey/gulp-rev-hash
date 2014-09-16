@@ -10,25 +10,32 @@ module.exports = function(options) {
 
   var startReg = /<!--\s*rev\-hash\s*-->/gim;
   var endReg = /<!--\s*end\s*-->/gim;
-  var jsReg = /<\s*script\s+.*?src\s*=\s*"([^"]+.js).*".*?><\s*\/\s*script\s*>/gi;
-  var cssReg = /<\s*link\s+.*?href\s*=\s*"([^"]+.css).*".*?>/gi;
+  var jsAndCssReg = /<\s*script\s+.*?src\s*=\s*"([^"]+.js).*".*?><\s*\/\s*script\s*>|<\s*link\s+.*?href\s*=\s*"([^"]+.css).*".*?>/gi;
+  var regSpecialsReg = /([.?*+^$[\]\\(){}|-])/g;
   var basePath, mainPath, mainName, alternatePath;
 
   function getBlockType(content) {
     return jsReg.test(content) ? 'js' : 'css';
   }
 
-  function getFiles(content, reg) {
-    var paths = [];
-    var files = [];
+  function getTags(content) {
+    var tags = [];
 
     content
       .replace(/<!--(?:(?:.|\r|\n)*?)-->/gim, '')
-      .replace(reg, function (a, b) {
-        paths.push(b);
+      .replace(jsAndCssReg, function (a, b, c) {
+        tags.push({
+          html: a,
+          path: b || c,
+          pathReg: new RegExp(escapeRegSpecials(b || c) + '.*?"', 'g')
+        });
       });
 
-    return paths;
+    return tags;
+  }
+
+  function escapeRegSpecials(str) {
+    return (str + '').replace(regSpecialsReg, "\\$1");
   }
 
   return through.obj(function(file, enc, callback) {
@@ -50,30 +57,21 @@ module.exports = function(options) {
 
       for (var i = 0, l = sections.length; i < l; ++i) {
         if (sections[i].match(startReg)) {
-          var assets, type;
+          var tag;
           var section = sections[i].split(startReg);
+          var tags = getTags(section[1]);
           html.push(section[0]);
           html.push('<!-- rev-hash -->\r\n')
 
-          var cssAssets = getFiles(section[1], cssReg);
-          var jsAssets = getFiles(section[1], jsReg);
-          if (cssAssets.length > 0) { assets = cssAssets; type = 'css' }
-          else { assets = jsAssets; type = 'js' }
-
-          for (var j = 0; j < assets.length; j++) {
-            asset = assets[j];
+          for (var j = 0; j < tags.length; j++) {
+            tag = tags[j];
             var hash = require('crypto')
               .createHash('md5')
               .update(
                 fs.readFileSync(
-                  path.join((options.assetsDir?options.assetsDir:''), asset), {encoding: 'utf8'}))
+                  path.join((options.assetsDir?options.assetsDir:''), tag.path), {encoding: 'utf8'}))
               .digest("hex");
-              if (type === 'css') {
-                html.push('<link rel="stylesheet" href="' + asset + '?v=' + hash + '"/>\r\n');
-              }
-              else {
-                html.push('<script src="' + asset + '?v=' + hash + '"></script>\r\n');
-              }
+            html.push(tag.html.replace(tag.pathReg, tag.path + '?v=' + hash + '"') + '\r\n');
           }
           html.push('<!-- end -->');
         }
