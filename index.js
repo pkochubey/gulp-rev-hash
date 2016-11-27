@@ -65,12 +65,7 @@ module.exports = function(options) {
 
           for (var j = 0; j < tags.length; j++) {
             tag = tags[j];
-            var hash = require('crypto')
-              .createHash('md5')
-              .update(
-                fs.readFileSync(
-                  path.join((options.assetsDir?options.assetsDir:''), tag.path), {encoding: 'utf8'}))
-              .digest("hex");
+            var hash = require('crypto').randomBytes(16).toString("hex");
             html.push(tag.html.replace(tag.pathReg, tag.path + '?v=' + hash + '"') + '\r\n');
           }
           html.push('<!-- end -->');

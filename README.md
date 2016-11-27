@@ -6,7 +6,7 @@ gulp-rev-hash
 ## Install
 
 ```
-npm install --save-dev gulp-rev-hash
+npm install --save-dev gulp-rev-simple-hash
 ```
 
 
@@ -18,11 +18,11 @@ This example will keep links to assets in `layouts/_base.ect` ECT template alway
 
 ```js
 var gulp = require('gulp');
-var revHash = require('gulp-rev-hash');
+var rev = require('gulp-rev-simple-hash');
 
 gulp.task('rev-hash', function () {
 	gulp.src('layouts/_base.ect')
-		.pipe(revHash())
+		.pipe(rev())
 		.pipe(gulp.dest('layouts'));
 });
 ```
