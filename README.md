@@ -1,7 +1,7 @@
 gulp-rev-simple-hash
 =============
 
-> Keeps a file's hash in file's links to your assets. For automatic cache updating purpose.
+> Keeps a hash in file's links to your assets. For automatic cache updating purpose.
 
 ## Install
 
@@ -18,11 +18,11 @@ This example will keep links to assets in `layouts/_base.ect` ECT template alway
 
 ```js
 var gulp = require('gulp');
-var rev = require('gulp-rev-simple-hash');
+var revHash = require('gulp-rev-simple-hash');
 
 gulp.task('rev-hash', function () {
 	gulp.src('layouts/_base.ect')
-		.pipe(rev())
+		.pipe(revHash())
 		.pipe(gulp.dest('layouts'));
 });
 ```
